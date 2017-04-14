@@ -15,7 +15,7 @@ public class MyTestController {
         // Creating a new server:
         DominoConfigProvider config = DominoConfigProvider.getInstance();
 
-        DominoServer dominoServer = new DominoServer((Integer) config.getValueOf("server_port"));
+        DominoServer dominoServer = new DominoServer((Integer) config.getValueOf("server_port"), 2, "dominos.txt", "serverlog.log");
 
     }
 

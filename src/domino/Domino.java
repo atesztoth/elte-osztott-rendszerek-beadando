@@ -1,6 +1,7 @@
 package domino;
 
 /**
+ * Represents a domino. Used package-wide.
  * Created by atesztoth on 2017. 04. 05..
  */
 public class Domino {
@@ -23,6 +24,11 @@ public class Domino {
 
     public int getSide2() {
         return side2;
+    }
+
+    public String convertToText() {
+        // toString() v2 lol
+        return side1 + " " + side2;
     }
 
     @Override
