@@ -17,7 +17,6 @@ public class DominoServer extends AbstractServer {
     private int numberOfPlayers;
     private String dominoFile;
     private String logFile;
-    private ArrayList<Socket> clients = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         // numberOfPlayas dominoFile logFile
@@ -36,11 +35,7 @@ public class DominoServer extends AbstractServer {
 
         DominoServer dominoServer = new DominoServer((Integer) dominoConfigProvider.getValueOf("server_port"), n, args[1], args[2]);
 
-        try {
-            dominoServer.startGame();
-        } catch (IOException e) {
-            System.out.println("Nem sikerült fogadni a kapcsolatokat.");
-        }
+        dominoServer.startGame();
     }
 
     public DominoServer(int port, int numberOfPlayers, String dominoFile, String logFile) {
@@ -52,10 +47,11 @@ public class DominoServer extends AbstractServer {
     }
 
 
-    public void startGame() throws IOException {
+    public void startGame() {
         // Wait for players to join:
-        for (int i = 0; i < numberOfPlayers; ++i) {
-            clients.add(serverSocket.accept());
+        // Every client I have to give a new thread.
+        for (int i = 0; i < numberOfPlayers; i++) {
+
         }
     }
 
