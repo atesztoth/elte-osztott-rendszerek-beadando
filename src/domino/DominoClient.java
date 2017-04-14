@@ -1,5 +1,7 @@
 package domino;
 
+import domino.Exception.BadDominoException;
+
 import java.util.ArrayList;
 
 /**

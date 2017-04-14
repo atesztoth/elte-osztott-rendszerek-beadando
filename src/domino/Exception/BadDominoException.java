@@ -1,4 +1,4 @@
-package domino;
+package domino.Exception;
 
 /**
  * Created by atesztoth on 2017. 04. 05..
