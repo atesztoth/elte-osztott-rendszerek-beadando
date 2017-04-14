@@ -24,4 +24,12 @@ public class Domino {
     public int getSide2() {
         return side2;
     }
+
+    @Override
+    public String toString() {
+        return "Domino{" +
+                "side1=" + side1 +
+                ", side2=" + side2 +
+                '}';
+    }
 }
