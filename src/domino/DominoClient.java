@@ -10,10 +10,21 @@ import java.util.ArrayList;
 public class DominoClient {
 
     private String userName = "";
-    private int port = 60504;
     ArrayList<Domino> dominos = new ArrayList<>();
 
+    // For testing
     public static void main(String[] args) {
+
+    }
+
+    public DominoClient(String userName) {
+        this.userName = userName;
+    }
+
+    public void connectToServer() {
+        // Getting props of the server from the config provider of this project:
+
+        DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
 
     }
 

@@ -24,6 +24,11 @@ public class AbstractServer implements ServerInterface {
         this.port = port;
     }
 
+    // Lol actually I need the socker like a 1000 times so:
+    public ServerSocket getServerSocket() {
+        return this.serverSocket;
+    }
+
     @Override
     public void createServer() throws IOException {
         serverSocket = new ServerSocket(port);

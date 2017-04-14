@@ -13,7 +13,7 @@ public class MyTestController {
 
     public static void main(String[] args) {
         // Creating a new server:
-        DominoConfigProvider config = new DominoConfigProvider();
+        DominoConfigProvider config = DominoConfigProvider.getInstance();
 
         DominoServer dominoServer = new DominoServer((Integer) config.getValueOf("server_port"));
 
