@@ -116,7 +116,7 @@ public class DominoServer extends AbstractServer {
                 threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString()));
                 threads.get(i).start();
 
-                System.out.printf("Client joined!");
+                System.out.printf("Client joined!" + System.getProperty("line.separator"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

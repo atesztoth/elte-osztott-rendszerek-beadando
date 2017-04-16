@@ -1,13 +1,18 @@
 package domino;
 
 import domino.Exception.BadDominoException;
+import domino.Exception.BadInitialDominoStringException;
 import domino.Exception.FakeCommandException;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Scanner;
+
+import static java.lang.System.exit;
 
 /**
  * The class representing a DominoClient.
@@ -20,6 +25,11 @@ public class DominoClient {
 
     private DominoFileWriter dominoFileWriter = null;
     private Socket socket = null;
+
+    // Communication
+    private Scanner scanner;
+    private PrintWriter printWriter;
+    private boolean gotMyInitial = false;
 
     // We have to use command line args :(
     // Should look like this: DominoClient.java userName
@@ -45,21 +55,41 @@ public class DominoClient {
         return userName;
     }
 
+    /**
+     * The following method connects to the server and by that, starts the whole program.
+     */
     public void connectToServer() {
         // Getting props of the server from the config provider of this project:
         DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
 
-        /**
-         * Real code is gonna be under this comment:
-         */
-
-        System.out.printf("Trying to connect to the server...");
+        System.out.printf("Trying to connect to the server..." + System.getProperty("line.separator"));
         try {
             socket = new Socket("localhost", (Integer) config.getValueOf("server_port"));
+            scanner = new Scanner(socket.getInputStream());
+            printWriter = new PrintWriter(socket.getOutputStream(), true);
 
             // Here we gonna store our dominos based on server's answer...
+            System.out.printf(userName + ": kapcsolódtam." + System.getProperty("line.separator"));
 
-            System.out.printf(userName + ": kapcsolódtam.");
+            while (true) {
+                String serverMessage = scanner.nextLine();
+                System.out.println("Server command: " + serverMessage);
+
+                try {
+                    processServerCommand(serverMessage);
+                } catch (FakeCommandException e) {
+                    // This should be caught right here.
+                    System.out.println("Hibás utasítást kaptam! " + System.getProperty("line.separator"));
+                    e.printStackTrace();
+                } catch (BadInitialDominoStringException e) {
+                    e.printStackTrace();
+                    exit(1);
+                }
+
+                if (serverMessage.equals("VEGE")) {
+                    break;
+                }
+            }
 
             socket.close();
         } catch (IOException e) {
@@ -73,10 +103,35 @@ public class DominoClient {
      * of the class, and throwing exceptions if neccessary.
      *
      * @param command Command sent by the server.
-     * @throws FakeCommandException, IOException
+     * @throws FakeCommandException, IOException, BadInitialDominoStringException
      */
-    private void processServerCommand(String command) throws FakeCommandException, IOException {
+    private void processServerCommand(String command) throws FakeCommandException, IOException, BadInitialDominoStringException {
         boolean basicCommand = true;
+
+        if(!gotMyInitial) {
+            // 65 34--6 9--10 12--31 25--14 5--15 6--6 8
+
+            // Then we are waiting for the initials doing nothing else:
+            String initialDominoRegexp = "(([0-9]+ [0-9]+)--)+([0-9]+ [0-9]+)";
+
+            if(!command.matches(initialDominoRegexp)) {
+                throw new BadInitialDominoStringException("Hibás init domino stringet kaptam!");
+            }
+
+            // Process initial pack of dominos:
+            String[] individualDominos = command.split("--");
+
+            for (String dominoString : individualDominos) {
+                try {
+                    saveDomino(dominoString);
+                } catch (BadDominoException e) {
+                    e.printStackTrace();
+                    exit(1);
+                }
+            }
+
+            return; // End this cycle.
+        }
 
         switch (command) {
             case "START":
@@ -88,7 +143,7 @@ public class DominoClient {
                 dominoFileWriter.writeToFile(msg, true, true);
 
                 // Give a chance for the server to end the game properly...
-                socket.close();
+                // socket.close(); // Gonna be handled in the method that calls this.
                 break;
             case "NINCS":
                 System.out.printf(userName + ": NINCS " + System.getProperty("line.separator"));
@@ -177,6 +232,9 @@ public class DominoClient {
         // removing this:
         dominos.remove(0);
 
+        // Send the domino to the server:
+        printWriter.println(first.getSide1() + System.getProperty("line.separator"));
+
         String msg = userName + ": START " + first.toString() + System.getProperty("line.separator");
         System.out.printf(msg);
         dominoFileWriter.writeToFile(msg, true, true);
@@ -185,7 +243,7 @@ public class DominoClient {
     /**
      * This method is going to process one domino in the following form: "firstSide secondSide".
      *
-     * @param domino
+     * @param domino The domino that should be saved.
      */
     private void saveDomino(String domino) throws BadDominoException {
         String[] sides = domino.split(" ");
