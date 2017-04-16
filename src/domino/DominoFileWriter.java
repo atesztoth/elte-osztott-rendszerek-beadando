@@ -3,7 +3,7 @@ package domino;
 import java.io.*;
 
 /**
- * Separting logic for log file writing for my server.
+ * Separting logic for log file writing of my server.
  * Created by atesztoth on 2017. 04. 14..
  */
 public class DominoFileWriter {
@@ -15,9 +15,15 @@ public class DominoFileWriter {
         this.fileName = fileName;
     }
 
-    public void writeToFile(String line, boolean append, boolean autoFlush) {
+    /**
+     * This should be used to output your content to your file.
+     * Synchronized, so this can be used when the object is shared.
+     * @param line The line to print.
+     * @param append Sets up appending.
+     */
+    public synchronized void writeToFile(String line, boolean append) {
         try {
-            createPrintWriter(append, autoFlush);
+            createPrintWriter(append, true);
             printWriter.write(line + System.getProperty("line.separator"));
             closePrintWriter();
         } catch (FileNotFoundException e) {
@@ -25,10 +31,19 @@ public class DominoFileWriter {
         }
     }
 
+    /**
+     * Helps instantiating the core of this class, a PrintWriter object.
+     * @param append Appending.
+     * @param autoFlush AutoFlush.
+     * @throws FileNotFoundException
+     */
     private void createPrintWriter(boolean append, boolean autoFlush) throws FileNotFoundException {
         this.printWriter = new PrintWriter(new FileOutputStream(new File(fileName), append), autoFlush);
     }
 
+    /**
+     * Talks for itself.
+     */
     private void closePrintWriter() {
         this.printWriter.close();
     }

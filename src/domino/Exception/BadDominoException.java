@@ -10,6 +10,6 @@ public class BadDominoException extends Exception {
     }
 
     public BadDominoException() {
-
+        super();
     }
 }

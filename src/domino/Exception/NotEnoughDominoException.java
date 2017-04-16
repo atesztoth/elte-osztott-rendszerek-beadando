@@ -9,6 +9,6 @@ public class NotEnoughDominoException extends Exception {
     }
 
     public NotEnoughDominoException() {
-
+        super();
     }
 }

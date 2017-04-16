@@ -13,12 +13,20 @@ public class DominoServerParamBag {
     private ArrayList<Domino> talon = new ArrayList<>();
     private DominoClientMessageEntity dominoClientMessageEntity = null;
     private boolean gameOn = true; // indicates if the game has ended
+    private boolean hasAnyoneSentDominoIn = false;
 
     public DominoServerParamBag() {
     }
 
     public synchronized ArrayList<Domino> getTalon() {
         return talon;
+    }
+
+    public synchronized Domino getOneFromTalon() {
+        Domino d = talon.get(0);
+        talon.remove(d);
+
+        return d;
     }
 
     public synchronized void setTalon(ArrayList<Domino> talon) {
@@ -39,5 +47,21 @@ public class DominoServerParamBag {
 
     public synchronized void setGameOn(boolean gameOn) {
         this.gameOn = gameOn;
+    }
+
+    public synchronized boolean getHasAnyoneSentDominoIn() {
+        return hasAnyoneSentDominoIn;
+    }
+
+    public synchronized void setHasAnyoneSentDominoIn(boolean hasAnyoneSentDominoIn) {
+        this.hasAnyoneSentDominoIn = hasAnyoneSentDominoIn;
+    }
+
+    /**
+     * Counts how many element there are in the talon.
+     * @return number of elements in the talon.
+     */
+    public synchronized int countTalon() {
+        return talon.size();
     }
 }

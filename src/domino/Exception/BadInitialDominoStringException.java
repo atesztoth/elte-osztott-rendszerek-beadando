@@ -6,6 +6,7 @@ package domino.Exception;
 public class BadInitialDominoStringException extends Exception {
 
     public BadInitialDominoStringException() {
+        super();
     }
 
     public BadInitialDominoStringException(String message) {

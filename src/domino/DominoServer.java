@@ -21,6 +21,7 @@ public class DominoServer extends AbstractServer {
     private String dominoFile;
     private String logFile;
     private DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
+    private DominoFileWriter dominoFileWriter;
 
     public static void main(String[] args) throws Exception {
         // numberOfPlayas dominoFile logFile
@@ -55,6 +56,7 @@ public class DominoServer extends AbstractServer {
         this.numberOfPlayers = numberOfPlayers;
         this.dominoFile = dominoFile;
         this.logFile = logFile;
+        this.dominoFileWriter = new DominoFileWriter(logFile);
     }
 
 
@@ -88,6 +90,9 @@ public class DominoServer extends AbstractServer {
         // A shared parameter bag:
         DominoServerParamBag dominoServerParamBag = new DominoServerParamBag();
 
+        // Create the fileWriter
+        dominoFileWriter = new DominoFileWriter(logFile);
+
         for (int i = 0; i < numberOfPlayers; i++) {
             try {
                 // Adding the connection to a list of mine:
@@ -114,7 +119,7 @@ public class DominoServer extends AbstractServer {
                 dominoServerParamBag.setTalon(dominos); // Current state of dominos array is always going to be the talon.
 
                 // Lets give it a thread, and correctly instantiate a handler object:
-                threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString()));
+                threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString(), dominoFileWriter));
                 threads.get(i).start();
 
                 System.out.printf("Client joined!" + System.getProperty("line.separator"));

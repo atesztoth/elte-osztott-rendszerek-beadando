@@ -10,7 +10,7 @@ public class InvalidPlayerNumberException extends Exception {
     }
 
     public InvalidPlayerNumberException() {
-
+        super();
     }
 
 }

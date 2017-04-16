@@ -143,14 +143,14 @@ public class DominoClient {
             case "VEGE":
                 String msg = userName + ": VEGE" + System.getProperty("line.separator");
                 System.out.printf(msg);
-                dominoFileWriter.writeToFile(msg, true, true);
+                dominoFileWriter.writeToFile(msg, true);
 
                 // Give a chance for the server to end the game properly...
                 // socket.close(); // Gonna be handled in the method that calls this.
                 break;
             case "NINCS":
                 System.out.printf(userName + ": NINCS " + System.getProperty("line.separator"));
-                dominoFileWriter.writeToFile(userName + ": NINCS " + System.getProperty("line.separator"), true, true);
+                dominoFileWriter.writeToFile(userName + ": NINCS " + System.getProperty("line.separator"), true);
                 break;
             default:
                 basicCommand = false;
@@ -202,12 +202,12 @@ public class DominoClient {
                     // Send the second side back
                     msg = userName + ": " + dominoNum + d.getSide2() + System.getProperty("line.separator");
                     System.out.printf(msg);
-                    dominoFileWriter.writeToFile(msg, true, true);
+                    dominoFileWriter.writeToFile(msg, true);
                 } else {
                     // Send the first side back
                     msg = userName + ": " + dominoNum + d.getSide1() + System.getProperty("line.separator");
                     System.out.printf(msg);
-                    dominoFileWriter.writeToFile(msg, true, true);
+                    dominoFileWriter.writeToFile(msg, true);
                 }
 
                 // Remove from our dominos.
@@ -221,7 +221,7 @@ public class DominoClient {
             // So when we couldn't find a domino that would match, we have to tell this to the server:
             msg = userName + ": UJ . NO MATCH!" + System.getProperty("line.separator");
             System.out.printf(msg);
-            dominoFileWriter.writeToFile(msg, true, true);
+            dominoFileWriter.writeToFile(msg, true);
         }
     }
 
@@ -240,7 +240,7 @@ public class DominoClient {
 
         String msg = userName + ": START " + first.toString() + System.getProperty("line.separator");
         System.out.printf(msg);
-        dominoFileWriter.writeToFile(msg, true, true);
+        dominoFileWriter.writeToFile(msg, true);
     }
 
     /**
