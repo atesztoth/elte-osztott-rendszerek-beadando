@@ -10,6 +10,6 @@ public class FakeCommandException extends Exception {
     }
 
     public FakeCommandException() {
-
+        super();
     }
 }

@@ -21,6 +21,7 @@ public class DominoServer extends AbstractServer {
     private String dominoFile;
     private String logFile;
     private DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
+    private DominoFileWriter dominoFileWriter;
 
     public static void main(String[] args) throws Exception {
         // numberOfPlayas dominoFile logFile
@@ -55,6 +56,7 @@ public class DominoServer extends AbstractServer {
         this.numberOfPlayers = numberOfPlayers;
         this.dominoFile = dominoFile;
         this.logFile = logFile;
+        this.dominoFileWriter = new DominoFileWriter(logFile);
     }
 
 
@@ -83,9 +85,13 @@ public class DominoServer extends AbstractServer {
         // Create a shared object that is gonna control threads work:
         // "ThreadController"
         DominoServerThreadHelper threadController = new DominoServerThreadHelper(1, numberOfPlayers);
+        threadController.blockThreads(); // Let no one do anything!
 
         // A shared parameter bag:
         DominoServerParamBag dominoServerParamBag = new DominoServerParamBag();
+
+        // Create the fileWriter
+        dominoFileWriter = new DominoFileWriter(logFile);
 
         for (int i = 0; i < numberOfPlayers; i++) {
             try {
@@ -113,7 +119,7 @@ public class DominoServer extends AbstractServer {
                 dominoServerParamBag.setTalon(dominos); // Current state of dominos array is always going to be the talon.
 
                 // Lets give it a thread, and correctly instantiate a handler object:
-                threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString()));
+                threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString(), dominoFileWriter));
                 threads.get(i).start();
 
                 System.out.printf("Client joined!" + System.getProperty("line.separator"));
@@ -121,6 +127,10 @@ public class DominoServer extends AbstractServer {
                 e.printStackTrace();
             }
         }
+
+        // Now everyone has connected. Let it roll!
+        threadController.letItRoll();
+        System.out.println("a-a-a, who goes after letitroll: " + threadController.getWhoGoes() + System.getProperty("line.separator"));
 
         // Before terminating the server, lets wait for all threads to finish:
         for (DominoServerClientHandler t : threads) {
@@ -145,7 +155,7 @@ public class DominoServer extends AbstractServer {
     /**
      * Gets dominos through DominoProvider. Also counts if there is enough dominos.
      *
-     * @return
+     * @return ArrayList of Dominos
      * @throws NotEnoughDominoException
      */
     private ArrayList<Domino> getDominos() throws NotEnoughDominoException {
