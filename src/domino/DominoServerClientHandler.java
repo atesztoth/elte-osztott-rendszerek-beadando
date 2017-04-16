@@ -80,5 +80,12 @@ public class DominoServerClientHandler extends Thread {
             // Sending a message invokes a response, so lets wait for that:
 
         }
+
+        while (true) {
+
+            if(!dominoServerParamBag.isGameOn()) {
+                break;
+            }
+        }
     }
 }

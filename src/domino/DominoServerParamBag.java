@@ -12,6 +12,7 @@ public class DominoServerParamBag {
 
     private ArrayList<Domino> talon = new ArrayList<>();
     private DominoClientMessageEntity dominoClientMessageEntity = null;
+    private boolean gameOn = true; // indicates if the game has ended
 
     public DominoServerParamBag() {
     }
@@ -30,5 +31,13 @@ public class DominoServerParamBag {
 
     public void setDominoClientMessageEntity(DominoClientMessageEntity dominoClientMessageEntity) {
         this.dominoClientMessageEntity = dominoClientMessageEntity;
+    }
+
+    public boolean isGameOn() {
+        return gameOn;
+    }
+
+    public void setGameOn(boolean gameOn) {
+        this.gameOn = gameOn;
     }
 }
