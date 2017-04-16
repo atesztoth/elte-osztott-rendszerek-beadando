@@ -3,7 +3,7 @@ package domino;
 import domino.ConfigProvider.AbstractConfigProvider;
 
 /**
- * Implemented using singleton principle. A very basic one, but it is fairly enough.
+ * Implemented using singleton principle.
  * Created by atesztoth on 2017. 04. 14..
  */
 public class DominoConfigProvider extends AbstractConfigProvider {
@@ -33,6 +33,12 @@ public class DominoConfigProvider extends AbstractConfigProvider {
             return;
         }
 
+        // The port to start the server at:
         addNewSetting("server_port", 60504);
+        // Path to the file that contains dominos:
+        addNewSetting("domino_file", "dominos.txt");
+        // Used for separating dominos when sending initial domino pack for clients.
+        // This is more like an "internal setting", but can be changed as a feature.
+        addNewSetting("domino_string_domino_separator", "--");
     }
 }
