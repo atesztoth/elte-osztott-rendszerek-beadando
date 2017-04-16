@@ -1,4 +1,4 @@
-package domino;
+package domino.Entity;
 
 /**
  * This class is a helper class for DominoServerParamBag for storing the last message.

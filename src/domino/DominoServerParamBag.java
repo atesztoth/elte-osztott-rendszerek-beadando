@@ -1,5 +1,7 @@
 package domino;
 
+import domino.Entity.DominoClientMessageEntity;
+
 import java.util.ArrayList;
 
 /**
