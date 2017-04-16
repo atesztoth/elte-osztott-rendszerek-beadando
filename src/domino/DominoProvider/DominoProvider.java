@@ -1,6 +1,7 @@
 package domino.DominoProvider;
 
 import domino.Domino;
+import domino.Exception.BadDominoException;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -35,7 +36,19 @@ public class DominoProvider implements DominoProviderInterface {
             // We can read now:
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                System.out.printf(line + " \n");
+                String[] sides = line.split(" ");
+
+                try {
+                    dominos.add(new Domino(Integer.parseInt(sides[0]), Integer.parseInt(sides[1])));
+                } catch (Exception e) {
+                    try {
+                        throw new BadDominoException("Hibás volt valamelyik oldal.");
+                    } catch (BadDominoException e1) {
+                        // Yes, yes, I know it seems like a joke to instantly catch your error. But I want to show an error
+                        // to the user, while making the program continue running. This is why I am doing this this way.
+                        System.out.println("A hibás dominó: " + line + System.getProperty("line.separator"));
+                    }
+                }
             }
         } catch (FileNotFoundException e) {
             System.out.printf("A keresett file nem található. \n");

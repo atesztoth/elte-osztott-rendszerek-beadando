@@ -20,10 +20,12 @@ public class AbstractServer implements ServerInterface {
     @Override
     public void createServer() throws IOException {
         serverSocket = new ServerSocket(port);
+        System.out.printf("Server started.");
     }
 
     @Override
     public void stopServer() throws IOException {
         serverSocket.close();
+        System.out.printf("Server closed.");
     }
 }

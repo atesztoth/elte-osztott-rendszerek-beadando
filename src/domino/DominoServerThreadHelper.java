@@ -3,6 +3,7 @@ package domino;
 /**
  * This class is synchronised class between threads of DominoServer helping to determine if a thread should
  * let code of it work, or wait for other to do it's job.
+ * This class is going to be a shared resource between threads.
  * Created by atesztoth on 2017. 04. 14..
  */
 public class DominoServerThreadHelper {

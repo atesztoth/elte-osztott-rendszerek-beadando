@@ -47,81 +47,35 @@ public class DominoClient {
 
     public void connectToServer() {
         // Getting props of the server from the config provider of this project:
-
         DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
-
-        // Getting the dominos. Remember, 7 reads!
-        // simulation:
-//        ArrayList<String> simulation = new ArrayList<>();
-//
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//        simulation.add(10 + " " + 5);
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//        simulation.add((new Random()).nextInt(20) + " " + (new Random()).nextInt(20));
-//
-//        for (String dominoString : simulation) {
-//            System.out.printf("Generated domino: " + dominoString + " \n");
-//
-//            try {
-//                saveDomino(dominoString);
-//            } catch (BadDominoException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        // Simulating start action:
-//        try {
-//            processServerCommand("START");
-//        } catch (FakeCommandException e) {
-//            e.printStackTrace();
-//        }
-//
-//        // Simulating start action:
-//        try {
-//            processServerCommand("10");
-//        } catch (FakeCommandException e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.printf("Dominos in dominos ArrayList: \n");
-//        for (Domino d : dominos) {
-//            System.out.println(d.toString() + " \n");
-//        }
 
         /**
          * Real code is gonna be under this comment:
          */
 
-        if (null != socket) {
-            try {
-                socket = new Socket("localhost", (Integer) config.getValueOf("server_port"));
+        System.out.printf("Trying to connect to the server...");
+        try {
+            socket = new Socket("localhost", (Integer) config.getValueOf("server_port"));
 
-                // Here we gonna store our dominos based on server's answer...
+            // Here we gonna store our dominos based on server's answer...
 
-            } catch (IOException e) {
-                System.out.printf("Nem tudtam kapcsolódni a szerverhez!");
-                e.printStackTrace();
-            }
+            System.out.printf(userName + ": kapcsolódtam.");
+
+            socket.close();
+        } catch (IOException e) {
+            System.out.printf("Nem tudtam kapcsolódni a szerverhez!");
+            e.printStackTrace();
         }
     }
-
-    /**
-     * NOTE: exceuting an Action works like this:
-     * processServerCommand gives the method a reference of the connection for sending data & things,
-     * in return, THAT METHOD is gonna listen for the server's response, and recall itself if there is an answer.
-     */
 
     /**
      * This method is responsible for "inside class routing" under which I mean invoking the correct methods
      * of the class, and throwing exceptions if neccessary.
      *
-     * @param command
-     * @throws FakeCommandException
+     * @param command Command sent by the server.
+     * @throws FakeCommandException, IOException
      */
-    private void processServerCommand(String command) throws FakeCommandException {
+    private void processServerCommand(String command) throws FakeCommandException, IOException {
         boolean basicCommand = true;
 
         switch (command) {
@@ -132,6 +86,9 @@ public class DominoClient {
                 String msg = userName + ": VEGE" + System.getProperty("line.separator");
                 System.out.printf(msg);
                 dominoFileWriter.writeToFile(msg, true, true);
+
+                // Give a chance for the server to end the game properly...
+                socket.close();
                 break;
             case "NINCS":
                 System.out.printf(userName + ": NINCS " + System.getProperty("line.separator"));
