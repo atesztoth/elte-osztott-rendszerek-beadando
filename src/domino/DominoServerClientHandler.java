@@ -114,6 +114,7 @@ public class DominoServerClientHandler extends Thread {
             // This is common for all the threads: They must end their processes, since there is no game happening.
             if (!dominoServerParamBag.isGameOn()) {
                 printWriter.println("VEGE");
+                threadHelper.switchTurns();
                 break;
             }
 
@@ -152,18 +153,22 @@ public class DominoServerClientHandler extends Thread {
             } else {
                 boolean breakWhile = false;
 
+                System.out.println(clientName + ": " + response + System.getProperty("line.separator"));
+
                 switch (response) {
                     case "UJ":
                         sendNewDominoFromTalon();
+                        threadHelper.switchTurns();
                         break;
                     case "NYERTEM":
                         System.out.println("A nyertes: " + clientName + System.getProperty("line.separator"));
                         winningAction();
                         breakWhile = true;
+                        threadHelper.switchTurns();
                         break;
                     default:
                         try {
-                            throw new FakeClientMessageException("Nem létező dolgot küldött a kliens.");
+                            throw new FakeClientMessageException("Nem létező dolgot küldött a kliens: \"" + response + "\" .");
                         } catch (FakeClientMessageException e) {
                             e.printStackTrace();
                             exit(1);
@@ -171,7 +176,7 @@ public class DominoServerClientHandler extends Thread {
                 }
 
                 // This stops while cycle of the thread.
-                if(breakWhile) {
+                if (breakWhile) {
                     break;
                 }
             }

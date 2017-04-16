@@ -21,16 +21,19 @@ public class DominoServerThreadHelper {
         // Except this id, everyone gets called one last time to finish the game.
         whoGoes = 0;
         skipThisId = winnerThreadId;
+        notifyAll();
     }
 
     public synchronized void blockThreads() {
         whoGoes = -1; // no thread should have an ID of -1...
         System.out.println("ThreadHelper: Threads blocked." + System.getProperty("line.separator"));
+        notifyAll();
     }
 
     public synchronized void letItRoll() {
         whoGoes = 0; // Set this to the first possible id.
         System.out.println("ThreadHelper: LET IT ROLL!" + System.getProperty("line.separator"));
+        notifyAll();
     }
 
     public synchronized int getWhoGoes() {
@@ -40,7 +43,7 @@ public class DominoServerThreadHelper {
     public synchronized void switchTurns() {
         int newWhoGoes = (whoGoes + 1) % howMany;
         whoGoes = newWhoGoes == skipThisId ? (newWhoGoes + 1) % howMany : newWhoGoes; // calculating id...
-        System.out.println("Thread in action: " + whoGoes + System.getProperty("line.separator"));
+        System.out.println("Switching turns: " + whoGoes + System.getProperty("line.separator"));
         notifyAll(); // ctrl + click, couldn't describe it any better.
     }
 

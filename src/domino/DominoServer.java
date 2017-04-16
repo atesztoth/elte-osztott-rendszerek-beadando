@@ -155,7 +155,7 @@ public class DominoServer extends AbstractServer {
     /**
      * Gets dominos through DominoProvider. Also counts if there is enough dominos.
      *
-     * @return
+     * @return ArrayList of Dominos
      * @throws NotEnoughDominoException
      */
     private ArrayList<Domino> getDominos() throws NotEnoughDominoException {

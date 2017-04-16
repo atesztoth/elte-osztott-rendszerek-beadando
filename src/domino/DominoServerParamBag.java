@@ -22,9 +22,17 @@ public class DominoServerParamBag {
         return talon;
     }
 
+    /**
+     *
+     * @return Returns first domino from the talon, null if nothing is in.
+     */
     public synchronized Domino getOneFromTalon() {
-        Domino d = talon.get(0);
-        talon.remove(d);
+        Domino d = null;
+
+        if (talon.size() > 0) {
+            d = talon.get(0);
+            talon.remove(d);
+        }
 
         return d;
     }
@@ -59,6 +67,7 @@ public class DominoServerParamBag {
 
     /**
      * Counts how many element there are in the talon.
+     *
      * @return number of elements in the talon.
      */
     public synchronized int countTalon() {
