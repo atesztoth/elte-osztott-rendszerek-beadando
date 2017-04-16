@@ -1,5 +1,7 @@
 package domino;
 
+import domino.Entity.DominoClientMessageEntity;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -18,6 +20,7 @@ public class DominoServerClientHandler extends Thread {
     private final DominoServerThreadHelper threadHelper;
     private final DominoServerParamBag dominoServerParamBag;
     private final String initialPack;
+    private String clientName;
 
     // In order to achive communicaiton:
     private PrintWriter printWriter; // For sending messages to the client.
@@ -57,7 +60,10 @@ public class DominoServerClientHandler extends Thread {
     public void run() {
         super.run();
 
-        System.out.println("Thread " + threadId + " is running!");
+        // Accept client's name
+        clientName = scanner.nextLine();
+
+        System.out.println("Thread " + threadId + " is running! Player: " + clientName + System.getProperty("line.separator"));
 
         // Actually we can do one thing before even thinking about what the thread should do,
         // whatever other things. To send the initial pack of dominos. This is an important things.
@@ -66,6 +72,8 @@ public class DominoServerClientHandler extends Thread {
 
         try {
             threadHelper.waitForMyTurn(threadId);
+
+            System.out.println("Niga, thread with player: " + clientName + " is rock n rollin!");
         } catch (InterruptedException e) {
             System.out.println("Failed to wait!");
             e.printStackTrace();
@@ -76,14 +84,28 @@ public class DominoServerClientHandler extends Thread {
         if (0 == threadId && !startSignalSent) {
             // Send start signal:
             printWriter.println("START");
+            startSignalSent = true;
+
+            System.out.println("Start signal sent!");
 
             // Sending a message invokes a response, so lets wait for that:
+            // The first client is going to send a side of a domino, you can be 100% sure about that it is valid.
+            DominoClientMessageEntity messageEntity = new DominoClientMessageEntity(scanner.nextLine(), clientName);
+            dominoServerParamBag.setDominoClientMessageEntity(messageEntity);
 
+            // We can pass the control to the next thread now:
+            threadHelper.switchTurns();
         }
 
         while (true) {
+            try {
+                threadHelper.waitForMyTurn(threadId);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                exit(1);
+            }
 
-            if(!dominoServerParamBag.isGameOn()) {
+            if (!dominoServerParamBag.isGameOn()) {
                 break;
             }
         }

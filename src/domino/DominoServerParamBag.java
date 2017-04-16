@@ -17,27 +17,27 @@ public class DominoServerParamBag {
     public DominoServerParamBag() {
     }
 
-    public ArrayList<Domino> getTalon() {
+    public synchronized ArrayList<Domino> getTalon() {
         return talon;
     }
 
-    public void setTalon(ArrayList<Domino> talon) {
+    public synchronized void setTalon(ArrayList<Domino> talon) {
         this.talon = talon;
     }
 
-    public DominoClientMessageEntity getDominoClientMessageEntity() {
+    public synchronized DominoClientMessageEntity getDominoClientMessageEntity() {
         return dominoClientMessageEntity;
     }
 
-    public void setDominoClientMessageEntity(DominoClientMessageEntity dominoClientMessageEntity) {
+    public synchronized void setDominoClientMessageEntity(DominoClientMessageEntity dominoClientMessageEntity) {
         this.dominoClientMessageEntity = dominoClientMessageEntity;
     }
 
-    public boolean isGameOn() {
+    public synchronized boolean isGameOn() {
         return gameOn;
     }
 
-    public void setGameOn(boolean gameOn) {
+    public synchronized void setGameOn(boolean gameOn) {
         this.gameOn = gameOn;
     }
 }

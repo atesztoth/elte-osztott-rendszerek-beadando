@@ -16,12 +16,23 @@ public class DominoServerThreadHelper {
         this.howMany = howMany;
     }
 
+    public synchronized void blockThreads() {
+        whoGoes = -1; // no thread should have an ID of -1...
+        System.out.println("ThreadHelper: Threads blocked." + System.getProperty("line.separator"));
+    }
+
+    public synchronized void letItRoll() {
+        whoGoes = 0; // Set this to the first possible id.
+        System.out.println("ThreadHelper: LET IT ROLL!" + System.getProperty("line.separator"));
+    }
+
     public synchronized int getWhoGoes() {
         return this.whoGoes;
     }
 
     public synchronized void switchTurns() {
         whoGoes = (whoGoes + 1) % howMany; // calculating id...
+        System.out.println("Thread in action: " + whoGoes + System.getProperty("line.separator"));
         notifyAll(); // ctrl + click, couldn't describe it any better.
     }
 

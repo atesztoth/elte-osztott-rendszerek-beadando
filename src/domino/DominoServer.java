@@ -83,6 +83,7 @@ public class DominoServer extends AbstractServer {
         // Create a shared object that is gonna control threads work:
         // "ThreadController"
         DominoServerThreadHelper threadController = new DominoServerThreadHelper(1, numberOfPlayers);
+        threadController.blockThreads(); // Let no one do anything!
 
         // A shared parameter bag:
         DominoServerParamBag dominoServerParamBag = new DominoServerParamBag();
@@ -121,6 +122,10 @@ public class DominoServer extends AbstractServer {
                 e.printStackTrace();
             }
         }
+
+        // Now everyone has connected. Let it roll!
+        threadController.letItRoll();
+        System.out.println("a-a-a, who goes after letitroll: " + threadController.getWhoGoes() + System.getProperty("line.separator"));
 
         // Before terminating the server, lets wait for all threads to finish:
         for (DominoServerClientHandler t : threads) {

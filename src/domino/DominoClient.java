@@ -71,6 +71,9 @@ public class DominoClient {
             // Here we gonna store our dominos based on server's answer...
             System.out.printf(userName + ": kapcsolódtam." + System.getProperty("line.separator"));
 
+            // Sending my name...
+            printWriter.println(userName);
+
             while (true) {
                 String serverMessage = scanner.nextLine();
                 System.out.println("Server command: " + serverMessage);
