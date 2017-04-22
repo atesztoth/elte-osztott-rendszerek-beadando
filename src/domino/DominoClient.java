@@ -57,28 +57,37 @@ public class DominoClient {
     public void connectToServer() {
         // Getting props of the server from the config provider of this project:
         DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
+        boolean debug = (Boolean) config.getValueOf("debug");
 
-        System.out.printf("Trying to connect to the server..." + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("Trying to connect to the server...");
+        }
+
         try {
             socket = new Socket("localhost", (Integer) config.getValueOf("server_port"));
             scanner = new Scanner(socket.getInputStream());
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
-            // Here we gonna store our dominos based on server's answer...
-            System.out.printf(userName + ": kapcsolódtam." + System.getProperty("line.separator"));
+            if (debug) {
+                // Here we gonna store our dominos based on server's answer...
+                System.out.println(userName + ": kapcsolódtam.");
+            }
 
             // Sending my name...
             printWriter.println(userName);
 
             while (true) {
                 String serverMessage = scanner.nextLine();
-                System.out.println("! Server sent: " + serverMessage);
+                if (debug) {
+                    // Shows all server command.
+                    System.out.println("! Server sent: " + serverMessage);
+                }
 
                 try {
                     processServerCommand(serverMessage);
                 } catch (FakeCommandException e) {
                     // This should be caught right here.
-                    System.out.println("Hibás utasítást kaptam! " + System.getProperty("line.separator"));
+                    System.out.println("Hibás utasítást kaptam!");
                     e.printStackTrace();
                 } catch (BadInitialDominoStringException e) {
                     e.printStackTrace();
@@ -92,7 +101,7 @@ public class DominoClient {
 
             socket.close();
         } catch (IOException e) {
-            System.out.printf("Nem tudtam kapcsolódni a szerverhez!");
+            System.out.println("Nem tudtam kapcsolódni a szerverhez!");
             e.printStackTrace();
         }
     }
@@ -140,15 +149,15 @@ public class DominoClient {
                 break;
             case "VEGE":
                 String msg = "Server command: VEGE";
-                System.out.printf(msg + System.getProperty("line.separator"));
+                System.out.println(msg);
                 dominoFileWriter.writeToFile(msg, true);
 
                 // Give a chance for the server to end the game properly...
                 // socket.close(); // Gonna be handled in the method that calls this.
                 break;
             case "NINCS":
-                System.out.printf("Server command: NINCS");
-                dominoFileWriter.writeToFile("Server command: NINCS " + System.getProperty("line.separator"), true);
+                System.out.println("Server command: NINCS");
+                dominoFileWriter.writeToFile("Server command: NINCS ", true);
                 break;
             default:
                 basicCommand = false;
@@ -164,7 +173,7 @@ public class DominoClient {
                 try {
                     saveDomino(command);
                 } catch (BadDominoException e) {
-                    System.out.printf("Nem tudtam menteni egy dominót, mert hiba volt vele." + System.getProperty("line.separator"));
+                    System.out.println("Nem tudtam menteni egy dominót, mert hiba volt vele.");
                 }
             } else {
                 switch (Integer.parseInt(command)) {
@@ -194,18 +203,17 @@ public class DominoClient {
 
             if (match) {
                 // Then this domino does match.
-                System.out.printf("Dominio MATCHED! " + System.getProperty("line.separator"));
 
                 if (firstSideMatch) {
                     // Send the second side back
-                    msg = userName + ": " + dominoNum + d.getSide2() + System.getProperty("line.separator");
-                    System.out.printf(msg);
+                    msg = userName + ": " + dominoNum + d.getSide2();
+                    System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
                     printWriter.println(d.getSide2());
                 } else {
                     // Send the first side back
-                    msg = userName + ": " + dominoNum + d.getSide1() + System.getProperty("line.separator");
-                    System.out.printf(msg);
+                    msg = userName + ": " + dominoNum + d.getSide1();
+                    System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
                     printWriter.println(d.getSide1());
                 }
@@ -219,8 +227,8 @@ public class DominoClient {
 
         if (!match) {
             // So when we couldn't find a domino that would match, we have to tell this to the server:
-            msg = userName + ": UJ . NO MATCH!" + System.getProperty("line.separator");
-            System.out.printf(msg);
+            msg = userName + ": UJ";
+            System.out.println(msg);
             dominoFileWriter.writeToFile(msg, true);
             printWriter.println("UJ");
         }
@@ -240,7 +248,7 @@ public class DominoClient {
         printWriter.println(first.getSide1());
 
         String msg = userName + ": START " + first.toString();
-        System.out.printf(msg + System.getProperty("line.separator"));
+        System.out.println(msg);
         dominoFileWriter.writeToFile(msg, true);
     }
 

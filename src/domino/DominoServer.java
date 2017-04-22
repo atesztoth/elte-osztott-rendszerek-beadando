@@ -34,7 +34,8 @@ public class DominoServer extends AbstractServer {
 
         if (n < 2 || n > 4) {
             System.out.println("Nem megfelelo a jatekosok szama.");
-            throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");
+            exit(1);
+//            throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");
         }
 
         DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();

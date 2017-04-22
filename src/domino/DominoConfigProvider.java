@@ -40,5 +40,6 @@ public class DominoConfigProvider extends AbstractConfigProvider {
         // Used for separating dominos when sending initial domino pack for clients.
         // This is more like an "internal setting", but can be changed as a feature.
         addNewSetting("domino_string_domino_separator", "--");
+        addNewSetting("debug", false); // Triggers some additional messages (poorly implemented)
     }
 }
