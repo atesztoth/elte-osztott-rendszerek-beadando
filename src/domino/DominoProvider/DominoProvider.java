@@ -7,6 +7,8 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import static java.lang.System.exit;
+
 /**
  * This class is responsible for providing dominos for the server, reading them from a file.
  * Created by atesztoth on 2017. 04. 14..
@@ -51,7 +53,9 @@ public class DominoProvider implements DominoProviderInterface {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.printf("A keresett file nem található. \n");
+            System.out.printf("A keresett file nem található." + System.getProperty("line.separator"));
+            e.printStackTrace();
+            exit(1);
         } catch (IOException e) {
             e.printStackTrace();
         }

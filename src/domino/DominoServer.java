@@ -33,6 +33,7 @@ public class DominoServer extends AbstractServer {
         int n = Integer.parseInt(args[0]);
 
         if (n < 2 || n > 4) {
+            System.out.println("Nem megfelelo a jatekosok szama.");
             throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");
         }
 
@@ -101,7 +102,7 @@ public class DominoServer extends AbstractServer {
                 // Building initial pack of dominos for the client:
                 StringBuilder initialPack = new StringBuilder();
                 int counter = 0;
-                for (Iterator<Domino> it = dominos.iterator(); it.hasNext();) {
+                for (Iterator<Domino> it = dominos.iterator(); it.hasNext(); ) {
                     Domino d = it.next();
 
                     initialPack.append(d.convertToText()).append(counter < 6 ? (String) dominoConfigProvider.getValueOf("domino_string_domino_separator") : "");
@@ -110,7 +111,7 @@ public class DominoServer extends AbstractServer {
                     // We should remove the domino from our list.
                     it.remove();
 
-                    if(7 == counter) {
+                    if (7 == counter) {
                         break;
                     }
                 }
@@ -159,7 +160,8 @@ public class DominoServer extends AbstractServer {
      * @throws NotEnoughDominoException
      */
     private ArrayList<Domino> getDominos() throws NotEnoughDominoException {
-        DominoProvider dominoProvider = new DominoProvider((String) dominoConfigProvider.getValueOf("domino_file"));
+//        DominoProvider dominoProvider = new DominoProvider((String) dominoConfigProvider.getValueOf("domino_file"));
+        DominoProvider dominoProvider = new DominoProvider(dominoFile);
         ArrayList<Domino> dominos = dominoProvider.getDominos();
 
         if (dominos.size() < numberOfPlayers * 7) {

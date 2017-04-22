@@ -38,8 +38,6 @@ public class DominoClient {
 
         DominoClient dominoClient = new DominoClient(args[0]);
 
-        System.out.printf("My name is: " + dominoClient.getUserName() + "\n");
-
         // Let's play:
         dominoClient.connectToServer();
     }
