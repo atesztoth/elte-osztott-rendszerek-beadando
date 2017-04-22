@@ -21,7 +21,8 @@ public class DominoFileWriter {
     /**
      * This should be used to output your content to your file.
      * Synchronized, so this can be used when the object is shared.
-     * @param line The line to print.
+     *
+     * @param line   The line to print.
      * @param append Sets up appending.
      */
     public synchronized void writeToFile(String line, boolean append) {
@@ -34,9 +35,20 @@ public class DominoFileWriter {
         }
     }
 
+    public synchronized void clearFile() {
+        try {
+            createPrintWriter(false, true);
+            printWriter.write("");
+            closePrintWriter();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Helps instantiating the core of this class, a PrintWriter object.
-     * @param append Appending.
+     *
+     * @param append    Appending.
      * @param autoFlush AutoFlush.
      * @throws FileNotFoundException
      */

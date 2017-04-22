@@ -23,7 +23,9 @@ public class DominoServerClientHandler extends Thread {
     private final String initialPack;
     private final DominoFileWriter dominoFileWriter;
     private String clientName;
-    private boolean stillInGame = true;
+    private boolean debug = false;
+    private boolean isTesterOn = false;
+    private DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
 
     // In order to achive communicaiton:
     private PrintWriter printWriter; // For sending messages to the client.
@@ -37,6 +39,9 @@ public class DominoServerClientHandler extends Thread {
         this.initialPack = initialPack;
         this.dominoFileWriter = dominoFileWriter;
 
+        debug = (Boolean) dominoConfigProvider.getValueOf("debug");
+        isTesterOn = (Boolean) dominoConfigProvider.getValueOf("trigger_testing_mode");
+
         try {
             printWriter = new PrintWriter(client.getOutputStream(), true);
             scanner = new Scanner(client.getInputStream());
@@ -49,13 +54,13 @@ public class DominoServerClientHandler extends Thread {
 
     @Override
     public void run() {
-        super.run();
-
         // Accept client's name
         clientName = scanner.nextLine();
-        dominoFileWriter.writeToFile(clientName + ": " + clientName, true);
+//        dominoFileWriter.writeToFile(clientName + ": " + clientName, true);
 
-        System.out.println("Thread " + threadId + " is running! Player: " + clientName + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("Thread " + threadId + " is running! Player: " + clientName);
+        }
 
         // Actually we can do one thing before even thinking about what the thread should do,
         // whatever other things. To send the initial pack of dominos. This is an important things.
@@ -63,9 +68,15 @@ public class DominoServerClientHandler extends Thread {
         printWriter.println(initialPack);
 
         try {
-            System.out.println("Thread with id: " + threadId + " is entering sleep mode.");
+            if (debug) {
+                System.out.println("Thread with id: " + threadId + " is entering sleep mode.");
+            }
+
             threadHelper.waitForMyTurn(threadId);
-            System.out.println("Thread with id: " + threadId + " is rock n rollin!");
+
+            if (debug) {
+                System.out.println("Thread with id: " + threadId + " is rock n rollin!");
+            }
         } catch (InterruptedException e) {
             System.out.println("Failed to wait!");
             e.printStackTrace();
@@ -77,7 +88,10 @@ public class DominoServerClientHandler extends Thread {
         if (0 == threadId) {
             // Send start signal:
             printWriter.println("START");
-            System.out.println("Start signal sent!");
+
+            if (debug) {
+                System.out.println("Start signal sent!");
+            }
 
             // Sending a message invokes a response, so lets wait for that:
             // The first client is going to send a side of a domino, you can be 100% sure about that it is valid.
@@ -109,6 +123,8 @@ public class DominoServerClientHandler extends Thread {
 
                 // Notify all the threads about that the game is over:
                 dominoServerParamBag.setGameOn(false);
+
+                dominoFileWriter.writeToFile("DONTETLEN", true);
             }
 
             // This is common for all the threads: They must end their processes, since there is no game happening.
@@ -140,6 +156,10 @@ public class DominoServerClientHandler extends Thread {
             // Handling response:
             String response = scanner.nextLine();
 
+            // I have forgotten to implement message logging oh. :(
+            // Let's do it now and call it a day:
+            dominoFileWriter.writeToFile(clientName + ": " + response, true);
+
             // See if it is a domino:
             if (response.matches("[0-9]+")) {
                 // Nice, we've got a domino back, lets store it:
@@ -153,7 +173,7 @@ public class DominoServerClientHandler extends Thread {
             } else {
                 boolean breakWhile = false;
 
-                System.out.println(clientName + ": " + response + System.getProperty("line.separator"));
+                System.out.println(clientName + ": " + response);
 
                 switch (response) {
                     case "UJ":
@@ -161,7 +181,9 @@ public class DominoServerClientHandler extends Thread {
                         threadHelper.switchTurns();
                         break;
                     case "NYERTEM":
-                        System.out.println("A nyertes: " + clientName + System.getProperty("line.separator"));
+                        if (debug) {
+                            System.out.println("A nyertes: " + clientName);
+                        }
                         winningAction();
                         breakWhile = true;
                         threadHelper.switchTurns();

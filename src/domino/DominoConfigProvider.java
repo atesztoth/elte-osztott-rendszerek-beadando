@@ -35,10 +35,16 @@ public class DominoConfigProvider extends AbstractConfigProvider {
 
         // The port to start the server at:
         addNewSetting("server_port", 60504);
-        // Path to the file that contains dominos:
-        addNewSetting("domino_file", "dominos.txt");
+        // Path to the file that contains dominos (example file):
+        addNewSetting("example_domino_file", "dominos.txt");
         // Used for separating dominos when sending initial domino pack for clients.
         // This is more like an "internal setting", but can be changed as a feature.
         addNewSetting("domino_string_domino_separator", "--");
+        addNewSetting("debug", false); // Triggers some additional messages (poorly implemented)
+
+        // If the following option is set to true, all cool exceptions are turned off that could
+        // insult the dearest tester in any way. The server keeps on running even though there are
+        // not quite right number of player provided, whatsoever.
+        addNewSetting("trigger_testing_mode", true);
     }
 }

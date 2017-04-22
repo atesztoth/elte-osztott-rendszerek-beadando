@@ -11,6 +11,7 @@ public class DominoServerThreadHelper {
     private int whoGoes; // "id" of the thread that can do it's thing
     private int howMany; // Number of how many threads there are.
     private int skipThisId = -1; // This id gets skipped.
+    private boolean debug = false; // Debug mode switcher
 
     public DominoServerThreadHelper(int whoGoes, int howMany) {
         this.whoGoes = whoGoes;
@@ -26,13 +27,17 @@ public class DominoServerThreadHelper {
 
     public synchronized void blockThreads() {
         whoGoes = -1; // no thread should have an ID of -1...
-        System.out.println("ThreadHelper: Threads blocked." + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("ThreadHelper: Threads blocked.");
+        }
         notifyAll();
     }
 
     public synchronized void letItRoll() {
         whoGoes = 0; // Set this to the first possible id.
-        System.out.println("ThreadHelper: LET IT ROLL!" + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("ThreadHelper: LET IT ROLL!");
+        }
         notifyAll();
     }
 
@@ -43,7 +48,9 @@ public class DominoServerThreadHelper {
     public synchronized void switchTurns() {
         int newWhoGoes = (whoGoes + 1) % howMany;
         whoGoes = newWhoGoes == skipThisId ? (newWhoGoes + 1) % howMany : newWhoGoes; // calculating id...
-        System.out.println("Switching turns: " + whoGoes + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("Switching turns: " + whoGoes);
+        }
         notifyAll(); // ctrl + click, couldn't describe it any better.
     }
 

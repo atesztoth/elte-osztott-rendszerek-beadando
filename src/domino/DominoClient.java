@@ -23,6 +23,7 @@ public class DominoClient {
 
     private DominoFileWriter dominoFileWriter = null;
     private Socket socket = null;
+    private DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
 
     // Communication
     private Scanner scanner;
@@ -37,8 +38,6 @@ public class DominoClient {
         }
 
         DominoClient dominoClient = new DominoClient(args[0]);
-
-        System.out.printf("My name is: " + dominoClient.getUserName() + "\n");
 
         // Let's play:
         dominoClient.connectToServer();
@@ -58,30 +57,55 @@ public class DominoClient {
      */
     public void connectToServer() {
         // Getting props of the server from the config provider of this project:
-        DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
+        boolean debug = (Boolean) config.getValueOf("debug");
 
-        System.out.printf("Trying to connect to the server..." + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("Trying to connect to the server...");
+        }
+
         try {
             socket = new Socket("localhost", (Integer) config.getValueOf("server_port"));
             scanner = new Scanner(socket.getInputStream());
             printWriter = new PrintWriter(socket.getOutputStream(), true);
 
-            // Here we gonna store our dominos based on server's answer...
-            System.out.printf(userName + ": kapcsolódtam." + System.getProperty("line.separator"));
+            if (debug) {
+                // Here we gonna store our dominos based on server's answer...
+                System.out.println(userName + ": kapcsolódtam.");
+            }
+
+            // Clear my file:
+            dominoFileWriter.clearFile();
 
             // Sending my name...
             printWriter.println(userName);
 
             while (true) {
-                String serverMessage = scanner.nextLine();
-                System.out.println("! Server sent: " + serverMessage);
+                // It was officially not counted as an error case scenario when
+                // no message was sent to the client. However, the tester thinks that
+                // works a bit different, so let's get ready for that kind of monkey business:
+                String serverMessage = "";
+
+                try {
+                    serverMessage = scanner.nextLine();
+                } catch (Exception e) {
+                    // Since scanner plays the good guy' rule here,
+                    // it's gonna throw a nice exception if no message was sent to it.
+                    // (Y) Nice job, scanner!
+                    break; // Let the client close the connection.
+                }
+
+                if (debug) {
+                    // Shows all server command.
+                    System.out.println("! Server sent: " + serverMessage);
+                }
 
                 try {
                     processServerCommand(serverMessage);
                 } catch (FakeCommandException e) {
                     // This should be caught right here.
-                    System.out.println("Hibás utasítást kaptam! " + System.getProperty("line.separator"));
+                    System.out.println("Hibás server message: " + serverMessage);
                     e.printStackTrace();
+                    exit(1);
                 } catch (BadInitialDominoStringException e) {
                     e.printStackTrace();
                     exit(1);
@@ -94,7 +118,7 @@ public class DominoClient {
 
             socket.close();
         } catch (IOException e) {
-            System.out.printf("Nem tudtam kapcsolódni a szerverhez!");
+            System.out.println("Nem tudtam kapcsolódni a szerverhez!");
             e.printStackTrace();
         }
     }
@@ -112,8 +136,10 @@ public class DominoClient {
         if (!gotMyInitial) {
             // 65 34--6 9--10 12--31 25--14 5--15 6--6 8
 
+            String separator = (String) config.getValueOf("domino_string_domino_separator");
+
             // Then we are waiting for the initials doing nothing else:
-            String initialDominoRegexp = "^(([0-9]+ [0-9]+)--)+([0-9]+ [0-9]+)$";
+            String initialDominoRegexp = "^(([0-9]+ [0-9]+)" + separator + ")+([0-9]+ [0-9]+)$";
 
             if (!command.matches(initialDominoRegexp)) {
                 throw new BadInitialDominoStringException("Hibás init domino stringet kaptam!");
@@ -142,15 +168,15 @@ public class DominoClient {
                 break;
             case "VEGE":
                 String msg = "Server command: VEGE";
-                System.out.printf(msg + System.getProperty("line.separator"));
+                System.out.println(msg);
                 dominoFileWriter.writeToFile(msg, true);
 
                 // Give a chance for the server to end the game properly...
                 // socket.close(); // Gonna be handled in the method that calls this.
                 break;
             case "NINCS":
-                System.out.printf("Server command: NINCS");
-                dominoFileWriter.writeToFile("Server command: NINCS " + System.getProperty("line.separator"), true);
+                System.out.println("Server command: NINCS");
+                dominoFileWriter.writeToFile("Server command: NINCS ", true);
                 break;
             default:
                 basicCommand = false;
@@ -166,14 +192,14 @@ public class DominoClient {
                 try {
                     saveDomino(command);
                 } catch (BadDominoException e) {
-                    System.out.printf("Nem tudtam menteni egy dominót, mert hiba volt vele." + System.getProperty("line.separator"));
+                    System.out.println("Nem tudtam menteni egy dominót, mert hiba volt vele.");
                 }
             } else {
-                switch (Integer.parseInt(command)) {
-                    case 0:
-                        throw new FakeCommandException("Nem létező parancsot kaptam.");
-                    default:
-                        handleDominoNumberAction(Integer.parseInt(command));
+                try {
+                    int number = Integer.parseInt(command);
+                    handleDominoNumberAction(number);
+                } catch (Exception e) {
+                    throw new FakeCommandException("Nem létező parancsot kaptam: " + command);
                 }
             }
         }
@@ -188,27 +214,34 @@ public class DominoClient {
         // Lets look for a domino that matches:
         boolean match = false;
         String msg = "";
+        System.out.println("kapott szám: " + dominoNum);
 
         for (Domino d : dominos) {
             boolean firstSideMatch = d.getSide1() == dominoNum;
             boolean secondSideMatch = d.getSide2() == dominoNum;
-            match = firstSideMatch && secondSideMatch;
+            match = firstSideMatch || secondSideMatch; // used && instead of ||
+            // It was a pleasure finding this bug. :D
 
             if (match) {
                 // Then this domino does match.
-                System.out.printf("Dominio MATCHED! " + System.getProperty("line.separator"));
+
+                System.out.println("kiválasztott domino: " + d.convertToText());
 
                 if (firstSideMatch) {
                     // Send the second side back
-                    msg = userName + ": " + dominoNum + d.getSide2() + System.getProperty("line.separator");
-                    System.out.printf(msg);
+                    System.out.println("elküldött szám: " + d.getSide2());
+                    msg = userName + ": " + dominoNum + " " + d.getSide2();
+                    System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
+
                     printWriter.println(d.getSide2());
                 } else {
                     // Send the first side back
-                    msg = userName + ": " + dominoNum + d.getSide1() + System.getProperty("line.separator");
-                    System.out.printf(msg);
+                    System.out.println("elküldött szám: " + d.getSide1());
+                    msg = userName + ": " + dominoNum + " " + d.getSide1();
+                    System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
+
                     printWriter.println(d.getSide1());
                 }
 
@@ -220,9 +253,10 @@ public class DominoClient {
         }
 
         if (!match) {
+            System.out.println("Nem találtam illeszkedő dominót.");
             // So when we couldn't find a domino that would match, we have to tell this to the server:
-            msg = userName + ": UJ . NO MATCH!" + System.getProperty("line.separator");
-            System.out.printf(msg);
+            msg = userName + ": UJ";
+            System.out.println(msg);
             dominoFileWriter.writeToFile(msg, true);
             printWriter.println("UJ");
         }
@@ -241,9 +275,9 @@ public class DominoClient {
         // Send the domino to the server:
         printWriter.println(first.getSide1());
 
-        String msg = userName + ": START " + first.toString();
-        System.out.printf(msg + System.getProperty("line.separator"));
-        dominoFileWriter.writeToFile(msg, true);
+        String msg = userName + ": START " + first.getSide1();
+        System.out.println(msg);
+        dominoFileWriter.writeToFile(msg, false);
     }
 
     /**
