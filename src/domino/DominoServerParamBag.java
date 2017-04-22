@@ -75,11 +75,11 @@ public class DominoServerParamBag {
         this.siaTheGreatestThreadId = siaTheGreatestThreadId;
     }
 
-    public int getMaxIdWorthChecking() {
+    public synchronized int getMaxIdWorthChecking() {
         return maxIdWorthChecking;
     }
 
-    public void setMaxIdWorthChecking(int maxIdWorthChecking) {
+    public synchronized void setMaxIdWorthChecking(int maxIdWorthChecking) {
         this.maxIdWorthChecking = maxIdWorthChecking;
     }
 }
