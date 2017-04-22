@@ -73,6 +73,9 @@ public class DominoClient {
                 System.out.println(userName + ": kapcsolódtam.");
             }
 
+            // Clear my file:
+            dominoFileWriter.clearFile();
+
             // Sending my name...
             printWriter.println(userName);
 
@@ -100,8 +103,9 @@ public class DominoClient {
                     processServerCommand(serverMessage);
                 } catch (FakeCommandException e) {
                     // This should be caught right here.
-                    System.out.println("Hibás utasítást kaptam!");
+                    System.out.println("Hibás server message: " + serverMessage);
                     e.printStackTrace();
+                    exit(1);
                 } catch (BadInitialDominoStringException e) {
                     e.printStackTrace();
                     exit(1);
@@ -191,11 +195,11 @@ public class DominoClient {
                     System.out.println("Nem tudtam menteni egy dominót, mert hiba volt vele.");
                 }
             } else {
-                switch (Integer.parseInt(command)) {
-                    case 0:
-                        throw new FakeCommandException("Nem létező parancsot kaptam.");
-                    default:
-                        handleDominoNumberAction(Integer.parseInt(command));
+                try {
+                    int number = Integer.parseInt(command);
+                    handleDominoNumberAction(number);
+                } catch (Exception e) {
+                    throw new FakeCommandException("Nem létező parancsot kaptam: " + command);
                 }
             }
         }
@@ -214,20 +218,21 @@ public class DominoClient {
         for (Domino d : dominos) {
             boolean firstSideMatch = d.getSide1() == dominoNum;
             boolean secondSideMatch = d.getSide2() == dominoNum;
-            match = firstSideMatch && secondSideMatch;
+            match = firstSideMatch || secondSideMatch; // used && instead of ||
+            // It was a pleasure finding this bug. :D
 
             if (match) {
                 // Then this domino does match.
 
                 if (firstSideMatch) {
                     // Send the second side back
-                    msg = userName + ": " + dominoNum + d.getSide2();
+                    msg = userName + ": " + dominoNum + " " + d.getSide2();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
                     printWriter.println(d.getSide2());
                 } else {
                     // Send the first side back
-                    msg = userName + ": " + dominoNum + d.getSide1();
+                    msg = userName + ": " + dominoNum + " " + d.getSide1();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
                     printWriter.println(d.getSide1());
@@ -262,9 +267,9 @@ public class DominoClient {
         // Send the domino to the server:
         printWriter.println(first.getSide1());
 
-        String msg = userName + ": START " + first.toString();
+        String msg = userName + ": START " + first.getSide1();
         System.out.println(msg);
-        dominoFileWriter.writeToFile(msg, true);
+        dominoFileWriter.writeToFile(msg, false);
     }
 
     /**
