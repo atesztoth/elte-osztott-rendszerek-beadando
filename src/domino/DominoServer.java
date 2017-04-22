@@ -1,6 +1,5 @@
 package domino;
 
-import domino.ConfigProvider.ConfigProviderInterface;
 import domino.DominoProvider.DominoProvider;
 import domino.Exception.InvalidPlayerNumberException;
 import domino.Exception.NotEnoughDominoException;
