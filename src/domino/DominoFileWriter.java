@@ -1,6 +1,9 @@
 package domino;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 /**
  * Separting logic for log file writing of my server.
