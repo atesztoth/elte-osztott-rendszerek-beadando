@@ -13,8 +13,8 @@ public class DominoServerParamBag {
     private ArrayList<Domino> talon = new ArrayList<>();
     private DominoClientMessageEntity dominoClientMessageEntity = null;
     private boolean gameOn = true; // indicates if the game has ended
-    private boolean hasAnyoneSentDominoIn = false;
     private int siaTheGreatestThreadId = 0;
+    private int maxIdWorthChecking = -1;
 
     public DominoServerParamBag() {
     }
@@ -58,14 +58,6 @@ public class DominoServerParamBag {
         this.gameOn = gameOn;
     }
 
-    public synchronized boolean getHasAnyoneSentDominoIn() {
-        return hasAnyoneSentDominoIn;
-    }
-
-    public synchronized void setHasAnyoneSentDominoIn(boolean hasAnyoneSentDominoIn) {
-        this.hasAnyoneSentDominoIn = hasAnyoneSentDominoIn;
-    }
-
     /**
      * Counts how many element there are in the talon.
      *
@@ -81,5 +73,13 @@ public class DominoServerParamBag {
 
     public synchronized void setSiaTheGreatestThreadId(int siaTheGreatestThreadId) {
         this.siaTheGreatestThreadId = siaTheGreatestThreadId;
+    }
+
+    public int getMaxIdWorthChecking() {
+        return maxIdWorthChecking;
+    }
+
+    public void setMaxIdWorthChecking(int maxIdWorthChecking) {
+        this.maxIdWorthChecking = maxIdWorthChecking;
     }
 }

@@ -98,7 +98,7 @@ public class DominoServerClientHandler extends Thread {
             dominoServerParamBag.setDominoClientMessageEntity(messageEntity);
 
             // In the first round it is a sure thing that a domino comes in.
-            dominoServerParamBag.setHasAnyoneSentDominoIn(true);
+            dominoServerParamBag.setMaxIdWorthChecking(-1);
 
             // Must write the message of the client to a file:
             dominoFileWriter.writeToFile(clientName + ": " + messageEntity.getLastMessage(), true);
@@ -122,19 +122,18 @@ public class DominoServerClientHandler extends Thread {
                 break;
             }
 
-            // When a round begins, thread 0 sets the following self-explaining flag to false:
-            if (0 == threadId) {
-                dominoServerParamBag.setHasAnyoneSentDominoIn(false);
-            }
-
             // Sending last message for the client:
             printWriter.println(dominoServerParamBag.getDominoClientMessageEntity().getLastMessage());
 
             // Handling response:
             String response = scanner.nextLine();
 
+            // I have forgotten to implement message logging oh. :(
+            // Let's do it now and call it a day:
+            dominoFileWriter.writeToFile(clientName + ": " + response, true);
+
             // GameOverAction: when no one could send a single domino in
-            if (response.equals("UJ") && dominoServerParamBag.getSiaTheGreatestThreadId() == threadId && !dominoServerParamBag.getHasAnyoneSentDominoIn() && 1 > dominoServerParamBag.countTalon()) {
+            if (response.equals("UJ") && threadId == dominoServerParamBag.getMaxIdWorthChecking() && 1 > dominoServerParamBag.countTalon()) {
                 // no one has sent in anything. Game over!
                 dominoServerParamBag.setGameOn(false);
                 dominoFileWriter.writeToFile("DONTETLEN", true);
@@ -145,9 +144,10 @@ public class DominoServerClientHandler extends Thread {
                 break;
             }
 
-            // I have forgotten to implement message logging oh. :(
-            // Let's do it now and call it a day:
-            dominoFileWriter.writeToFile(clientName + ": " + response, true);
+            // You must reset this flag AFTER you checked to see if the client has domino
+            if (threadId == dominoServerParamBag.getMaxIdWorthChecking()) {
+                dominoServerParamBag.setMaxIdWorthChecking(-1); // all
+            }
 
             // See if it is a domino:
             if (response.matches("[0-9]+")) {
@@ -155,7 +155,7 @@ public class DominoServerClientHandler extends Thread {
                 dominoServerParamBag.setDominoClientMessageEntity(new DominoClientMessageEntity(response, clientName));
 
                 // Tick the flag, let's show that in this round there was a domino sent in:
-                dominoServerParamBag.setHasAnyoneSentDominoIn(true);
+                dominoServerParamBag.setMaxIdWorthChecking(threadId);
 
                 // Switching turns.
                 threadHelper.switchTurns();
@@ -199,6 +199,7 @@ public class DominoServerClientHandler extends Thread {
 
         // if we did not get null back from getOneFromTalon, we can send this to the client.
         if (null != (d = dominoServerParamBag.getOneFromTalon())) {
+            dominoServerParamBag.setMaxIdWorthChecking(threadId);
             printWriter.println(d.convertToText());
         } else {
             printWriter.println("NINCS");
