@@ -103,6 +103,9 @@ public class DominoServer extends AbstractServer {
         // Create the fileWriter
         dominoFileWriter = new DominoFileWriter(logFile);
 
+        // clear logfile (creates and / or truncates file):
+        dominoFileWriter.clearFile();
+
         for (int i = 0; i < numberOfPlayers; i++) {
             try {
                 // Adding the connection to a list of mine:
@@ -177,10 +180,9 @@ public class DominoServer extends AbstractServer {
      * Gets dominos through DominoProvider. Also counts if there is enough dominos.
      *
      * @return ArrayList of Dominos
-     * @throws NotEnoughDominoException
+     * @throws NotEnoughDominoException Throws it when there is not enough dominos in the input file.
      */
     private ArrayList<Domino> getDominos() throws NotEnoughDominoException {
-//        DominoProvider dominoProvider = new DominoProvider((String) dominoConfigProvider.getValueOf("domino_file"));
         DominoProvider dominoProvider = new DominoProvider(dominoFile);
         ArrayList<Domino> dominos = dominoProvider.getDominos();
 

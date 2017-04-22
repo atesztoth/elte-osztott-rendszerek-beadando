@@ -214,6 +214,7 @@ public class DominoClient {
         // Lets look for a domino that matches:
         boolean match = false;
         String msg = "";
+        System.out.println("kapott szám: " + dominoNum);
 
         for (Domino d : dominos) {
             boolean firstSideMatch = d.getSide1() == dominoNum;
@@ -224,17 +225,23 @@ public class DominoClient {
             if (match) {
                 // Then this domino does match.
 
+                System.out.println("kiválasztott domino: " + d.convertToText());
+
                 if (firstSideMatch) {
                     // Send the second side back
+                    System.out.println("elküldött szám: " + d.getSide2());
                     msg = userName + ": " + dominoNum + " " + d.getSide2();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
+
                     printWriter.println(d.getSide2());
                 } else {
                     // Send the first side back
+                    System.out.println("elküldött szám: " + d.getSide1());
                     msg = userName + ": " + dominoNum + " " + d.getSide1();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
+
                     printWriter.println(d.getSide1());
                 }
 
@@ -246,6 +253,7 @@ public class DominoClient {
         }
 
         if (!match) {
+            System.out.println("Nem találtam illeszkedő dominót.");
             // So when we couldn't find a domino that would match, we have to tell this to the server:
             msg = userName + ": UJ";
             System.out.println(msg);

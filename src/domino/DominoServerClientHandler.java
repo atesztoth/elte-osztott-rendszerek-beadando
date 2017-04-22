@@ -123,6 +123,8 @@ public class DominoServerClientHandler extends Thread {
 
                 // Notify all the threads about that the game is over:
                 dominoServerParamBag.setGameOn(false);
+
+                dominoFileWriter.writeToFile("DONTETLEN", true);
             }
 
             // This is common for all the threads: They must end their processes, since there is no game happening.
@@ -153,6 +155,10 @@ public class DominoServerClientHandler extends Thread {
 
             // Handling response:
             String response = scanner.nextLine();
+
+            // I have forgotten to implement message logging oh. :(
+            // Let's do it now and call it a day:
+            dominoFileWriter.writeToFile(clientName + ": " + response, true);
 
             // See if it is a domino:
             if (response.matches("[0-9]+")) {
