@@ -167,7 +167,7 @@ public class DominoClient {
                 doTheStaterAction();
                 break;
             case "VEGE":
-                String msg = "Server command: VEGE";
+                String msg = "Server command: " + command;
                 System.out.println(msg);
                 dominoFileWriter.writeToFile(msg, true);
 
@@ -175,8 +175,8 @@ public class DominoClient {
                 // socket.close(); // Gonna be handled in the method that calls this.
                 break;
             case "NINCS":
-                System.out.println("Server command: NINCS");
-                dominoFileWriter.writeToFile("Server command: NINCS ", true);
+                System.out.println("Server command: " + command);
+                dominoFileWriter.writeToFile("Server command: " + command, true);
                 break;
             default:
                 basicCommand = false;
@@ -214,7 +214,13 @@ public class DominoClient {
         // Lets look for a domino that matches:
         boolean match = false;
         String msg = "";
-        System.out.println("kapott szám: " + dominoNum);
+        System.out.println("(" + userName + ") kapott szám: " + dominoNum);
+
+        // only when in the next round we discover we won we tell the others... :D
+        // scumbag players:
+        if (dominos.size() == 0) {
+            printWriter.println("NYERTEM");
+        }
 
         for (Domino d : dominos) {
             boolean firstSideMatch = d.getSide1() == dominoNum;
@@ -225,11 +231,11 @@ public class DominoClient {
             if (match) {
                 // Then this domino does match.
 
-                System.out.println("kiválasztott domino: " + d.convertToText());
+                System.out.println("(" + userName + ") kiválasztott domino: " + d.convertToText());
 
                 if (firstSideMatch) {
                     // Send the second side back
-                    System.out.println("elküldött szám: " + d.getSide2());
+                    System.out.println("(" + userName + ") elküldött szám: " + d.getSide2());
                     msg = userName + ": " + dominoNum + " " + d.getSide2();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
@@ -237,7 +243,7 @@ public class DominoClient {
                     printWriter.println(d.getSide2());
                 } else {
                     // Send the first side back
-                    System.out.println("elküldött szám: " + d.getSide1());
+                    System.out.println("(" + userName + ") elküldött szám: " + d.getSide1());
                     msg = userName + ": " + dominoNum + " " + d.getSide1();
                     System.out.println(msg);
                     dominoFileWriter.writeToFile(msg, true);
@@ -253,7 +259,7 @@ public class DominoClient {
         }
 
         if (!match) {
-            System.out.println("Nem találtam illeszkedő dominót.");
+            System.out.println("(" + userName + ") Nem találtam illeszkedő dominót.");
             // So when we couldn't find a domino that would match, we have to tell this to the server:
             msg = userName + ": UJ";
             System.out.println(msg);

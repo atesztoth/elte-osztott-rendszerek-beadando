@@ -84,7 +84,6 @@ public class DominoServerClientHandler extends Thread {
         }
 
         // If this is the first thread, and start has not been sent yet...
-        boolean isStartRound = true;
         if (0 == threadId) {
             // Send start signal:
             printWriter.println("START");
@@ -116,17 +115,6 @@ public class DominoServerClientHandler extends Thread {
                 exit(1);
             }
 
-            // GameOverAction: when no one could send a single domino in
-            if (0 == threadId && !dominoServerParamBag.getHasAnyoneSentDominoIn() && !isStartRound && 1 > dominoServerParamBag.countTalon()) {
-                // So when it's the 0 id-ed thread again, no one has sent in a domino, and is not a start round, and we have no
-                // remaining elements in the talon.
-
-                // Notify all the threads about that the game is over:
-                dominoServerParamBag.setGameOn(false);
-
-                dominoFileWriter.writeToFile("DONTETLEN", true);
-            }
-
             // This is common for all the threads: They must end their processes, since there is no game happening.
             if (!dominoServerParamBag.isGameOn()) {
                 printWriter.println("VEGE");
@@ -134,27 +122,28 @@ public class DominoServerClientHandler extends Thread {
                 break;
             }
 
-            // We must keep track of the players actions, especially if they send a domino.
-            // We have to know, if a round without a domino sent in has happened. That means the end of the game.
-            // Set the flag to false whenever a new round begins:
-            // If, and only IF this thread is the beginner, the starter thread, it has the right to set
-            // the flag to false. Why? Because I am doing this by the following logic:
-            // If the started thread gets a domino, flag turns true, that okay...
-            // But what if it does not? It sets the flag to false, every other thread can only do one thing:
-            // set it to true. But if those, like the starter thread, do not get a domino, the flag gonna stay
-            // on "false" till the new round begins, which means no client has sent a domino in = end of the game.
-            if (0 == threadId && !isStartRound) {
+            // When a round begins, thread 0 sets the following self-explaining flag to false:
+            if (0 == threadId) {
                 dominoServerParamBag.setHasAnyoneSentDominoIn(false);
             }
-
-            // Ticking the flag of start round.
-            isStartRound = false;
 
             // Sending last message for the client:
             printWriter.println(dominoServerParamBag.getDominoClientMessageEntity().getLastMessage());
 
             // Handling response:
             String response = scanner.nextLine();
+
+            // GameOverAction: when no one could send a single domino in
+            if (response.equals("UJ") && dominoServerParamBag.getSiaTheGreatestThreadId() == threadId && !dominoServerParamBag.getHasAnyoneSentDominoIn() && 1 > dominoServerParamBag.countTalon()) {
+                // no one has sent in anything. Game over!
+                dominoServerParamBag.setGameOn(false);
+                dominoFileWriter.writeToFile("DONTETLEN", true);
+
+                // Ending this thread separately:
+                printWriter.println("VEGE");
+                threadHelper.switchTurns();
+                break;
+            }
 
             // I have forgotten to implement message logging oh. :(
             // Let's do it now and call it a day:

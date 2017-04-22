@@ -99,6 +99,11 @@ public class DominoServer extends AbstractServer {
 
         // A shared parameter bag:
         DominoServerParamBag dominoServerParamBag = new DominoServerParamBag();
+        // I needed some way to let the current thread know that it is the last one
+        // because the tester uses a different method for deciding if a game draws.
+        // (I let the complete last round finish, WROTE DOWN THE LAST UJ MESSAGE, and only then ended the game
+        // right when a new round started, so thread with id 0 ended the game. Well, the tester doesn't like that...)
+        dominoServerParamBag.setSiaTheGreatestThreadId(numberOfPlayers - 1); // okay that prop name is a joke I admit
 
         // Create the fileWriter
         dominoFileWriter = new DominoFileWriter(logFile);

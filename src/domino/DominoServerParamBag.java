@@ -14,6 +14,7 @@ public class DominoServerParamBag {
     private DominoClientMessageEntity dominoClientMessageEntity = null;
     private boolean gameOn = true; // indicates if the game has ended
     private boolean hasAnyoneSentDominoIn = false;
+    private int siaTheGreatestThreadId = 0;
 
     public DominoServerParamBag() {
     }
@@ -72,5 +73,13 @@ public class DominoServerParamBag {
      */
     public synchronized int countTalon() {
         return talon.size();
+    }
+
+    public synchronized int getSiaTheGreatestThreadId() {
+        return siaTheGreatestThreadId;
+    }
+
+    public synchronized void setSiaTheGreatestThreadId(int siaTheGreatestThreadId) {
+        this.siaTheGreatestThreadId = siaTheGreatestThreadId;
     }
 }
