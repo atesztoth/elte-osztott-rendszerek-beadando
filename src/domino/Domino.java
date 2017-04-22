@@ -10,8 +10,8 @@ public class Domino {
     private int side2;
 
     /**
-     * @param side1
-     * @param side2
+     * @param side1 represents first side
+     * @param side2 represents second side
      */
     public Domino(int side1, int side2) {
         this.side1 = side1;
@@ -33,9 +33,6 @@ public class Domino {
 
     @Override
     public String toString() {
-        return "Domino{" +
-                "side1=" + side1 +
-                ", side2=" + side2 +
-                '}';
+        return "Domino{" + "side1=" + side1 + ", side2=" + side2 + '}';
     }
 }

@@ -43,8 +43,8 @@ public class DominoConfigProvider extends AbstractConfigProvider {
         addNewSetting("debug", false); // Triggers some additional messages (poorly implemented)
 
         // If the following option is set to true, all cool exceptions are turned off that could
-        // insult the dearest tester in any way. The server keeps on running even though there are
-        // not quite right number of player provided, whatsoever.
+        // insult the dearest tester in any way.
+        // Actually I forgot to implement setting the number of clients to 2 if invalid val given.
         addNewSetting("trigger_testing_mode", true);
     }
 }
