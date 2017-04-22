@@ -41,5 +41,10 @@ public class DominoConfigProvider extends AbstractConfigProvider {
         // This is more like an "internal setting", but can be changed as a feature.
         addNewSetting("domino_string_domino_separator", "--");
         addNewSetting("debug", false); // Triggers some additional messages (poorly implemented)
+
+        // If the following option is set to true, all cool exceptions are turned off that could
+        // insult the dearest tester in any way. The server keeps on running even though there are
+        // not quite right number of player provided, whatsoever.
+        addNewSetting("avoid_annoying_tester_things", true);
     }
 }

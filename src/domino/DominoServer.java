@@ -1,5 +1,6 @@
 package domino;
 
+import domino.ConfigProvider.ConfigProviderInterface;
 import domino.DominoProvider.DominoProvider;
 import domino.Exception.InvalidPlayerNumberException;
 import domino.Exception.NotEnoughDominoException;
@@ -25,6 +26,8 @@ public class DominoServer extends AbstractServer {
 
     public static void main(String[] args) throws Exception {
         // numberOfPlayas dominoFile logFile
+        DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
+        boolean avoidTester = (Boolean) dominoConfigProvider.getValueOf("avoid_annoying_tester_things");
 
         if (3 != args.length) {
             throw new Exception("Bad call! 3 argumentumot várok!");
@@ -34,11 +37,11 @@ public class DominoServer extends AbstractServer {
 
         if (n < 2 || n > 4) {
             System.out.println("Nem megfelelo a jatekosok szama.");
-            exit(1);
-//            throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");
-        }
 
-        DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
+            if (!avoidTester) {
+                throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");
+            }
+        }
 
         DominoServer dominoServer = new DominoServer((Integer) dominoConfigProvider.getValueOf("server_port"), n, args[1], args[2]);
 
@@ -71,6 +74,7 @@ public class DominoServer extends AbstractServer {
 
         // First, let's get those clients:
         ArrayList<Domino> dominos = null;
+        boolean debug = (Boolean) dominoConfigProvider.getValueOf("debug");
 
         try {
             dominos = getDominos();
@@ -82,7 +86,9 @@ public class DominoServer extends AbstractServer {
         ArrayList<Socket> clients = new ArrayList<>();
         ArrayList<DominoServerClientHandler> threads = new ArrayList<>();
 
-        System.out.printf("Waiting for connections... " + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("Waiting for connections... ");
+        }
 
         // Create a shared object that is gonna control threads work:
         // "ThreadController"
@@ -124,7 +130,9 @@ public class DominoServer extends AbstractServer {
                 threads.add(new DominoServerClientHandler(clients.get(i), i, threadController, dominoServerParamBag, initialPack.toString(), dominoFileWriter));
                 threads.get(i).start();
 
-                System.out.printf("Client joined!" + System.getProperty("line.separator"));
+                if (debug) {
+                    System.out.println("Client joined!");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -132,19 +140,28 @@ public class DominoServer extends AbstractServer {
 
         // Now everyone has connected. Let it roll!
         threadController.letItRoll();
-        System.out.println("a-a-a, who goes after letitroll: " + threadController.getWhoGoes() + System.getProperty("line.separator"));
+        if (debug) {
+            System.out.println("This thread goes after letitroll: " + threadController.getWhoGoes());
+        }
 
         // Before terminating the server, lets wait for all threads to finish:
         for (DominoServerClientHandler t : threads) {
             try {
                 t.join();
             } catch (InterruptedException e) {
-                System.out.printf("A join failed!");
+                if (debug) {
+                    System.out.println("A join failed!");
+                }
                 e.printStackTrace();
             }
         }
 
-        System.out.printf("Closing connections...");
+        // Yes, yes, I know it would have been more beautiful to use a method like
+        // printIfDebugEnabled or whatever, but debug mode was not even planned to be implemented.
+        if (debug) {
+            System.out.println("Closing connections...");
+        }
+
         for (Socket s : clients) {
             try {
                 s.close();
