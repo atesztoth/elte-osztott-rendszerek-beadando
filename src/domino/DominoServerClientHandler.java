@@ -40,7 +40,7 @@ public class DominoServerClientHandler extends Thread {
         this.dominoFileWriter = dominoFileWriter;
 
         debug = (Boolean) dominoConfigProvider.getValueOf("debug");
-        isTesterOn = (Boolean) dominoConfigProvider.getValueOf("avoid_annoying_tester_things");
+        isTesterOn = (Boolean) dominoConfigProvider.getValueOf("trigger_testing_mode");
 
         try {
             printWriter = new PrintWriter(client.getOutputStream(), true);
@@ -54,11 +54,9 @@ public class DominoServerClientHandler extends Thread {
 
     @Override
     public void run() {
-        super.run();
-
         // Accept client's name
         clientName = scanner.nextLine();
-        dominoFileWriter.writeToFile(clientName + ": " + clientName, true);
+//        dominoFileWriter.writeToFile(clientName + ": " + clientName, true);
 
         if (debug) {
             System.out.println("Thread " + threadId + " is running! Player: " + clientName);

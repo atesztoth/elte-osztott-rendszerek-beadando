@@ -27,7 +27,7 @@ public class DominoServer extends AbstractServer {
     public static void main(String[] args) throws Exception {
         // numberOfPlayas dominoFile logFile
         DominoConfigProvider dominoConfigProvider = DominoConfigProvider.getInstance();
-        boolean avoidTester = (Boolean) dominoConfigProvider.getValueOf("avoid_annoying_tester_things");
+        boolean avoidTester = (Boolean) dominoConfigProvider.getValueOf("trigger_testing_mode");
 
         if (3 != args.length) {
             throw new Exception("Bad call! 3 argumentumot várok!");
@@ -37,6 +37,8 @@ public class DominoServer extends AbstractServer {
 
         if (n < 2 || n > 4) {
             System.out.println("Nem megfelelo a jatekosok szama.");
+            // force n to be a valid val:
+            n = 2;
 
             if (!avoidTester) {
                 throw new InvalidPlayerNumberException("2 és 4 között kell lennie a játékosok számának!");

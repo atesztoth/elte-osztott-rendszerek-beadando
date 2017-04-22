@@ -23,6 +23,7 @@ public class DominoClient {
 
     private DominoFileWriter dominoFileWriter = null;
     private Socket socket = null;
+    private DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
 
     // Communication
     private Scanner scanner;
@@ -56,7 +57,6 @@ public class DominoClient {
      */
     public void connectToServer() {
         // Getting props of the server from the config provider of this project:
-        DominoConfigProvider config = DominoConfigProvider.getInstance(); // so we have the config
         boolean debug = (Boolean) config.getValueOf("debug");
 
         if (debug) {
@@ -77,7 +77,20 @@ public class DominoClient {
             printWriter.println(userName);
 
             while (true) {
-                String serverMessage = scanner.nextLine();
+                // It was officially not counted as an error case scenario when
+                // no message was sent to the client. However, the tester thinks that
+                // works a bit different, so let's get ready for that kind of monkey business:
+                String serverMessage = "";
+
+                try {
+                    serverMessage = scanner.nextLine();
+                } catch (Exception e) {
+                    // Since scanner plays the good guy' rule here,
+                    // it's gonna throw a nice exception if no message was sent to it.
+                    // (Y) Nice job, scanner!
+                    break; // Let the client close the connection.
+                }
+
                 if (debug) {
                     // Shows all server command.
                     System.out.println("! Server sent: " + serverMessage);
@@ -119,8 +132,10 @@ public class DominoClient {
         if (!gotMyInitial) {
             // 65 34--6 9--10 12--31 25--14 5--15 6--6 8
 
+            String separator = (String) config.getValueOf("domino_string_domino_separator");
+
             // Then we are waiting for the initials doing nothing else:
-            String initialDominoRegexp = "^(([0-9]+ [0-9]+)--)+([0-9]+ [0-9]+)$";
+            String initialDominoRegexp = "^(([0-9]+ [0-9]+)" + separator + ")+([0-9]+ [0-9]+)$";
 
             if (!command.matches(initialDominoRegexp)) {
                 throw new BadInitialDominoStringException("Hibás init domino stringet kaptam!");

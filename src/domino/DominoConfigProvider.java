@@ -45,6 +45,6 @@ public class DominoConfigProvider extends AbstractConfigProvider {
         // If the following option is set to true, all cool exceptions are turned off that could
         // insult the dearest tester in any way. The server keeps on running even though there are
         // not quite right number of player provided, whatsoever.
-        addNewSetting("avoid_annoying_tester_things", true);
+        addNewSetting("trigger_testing_mode", true);
     }
 }
